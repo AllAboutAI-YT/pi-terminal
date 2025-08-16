@@ -3,7 +3,7 @@
   "provider": {
     "openrouter": {
       "options": {
-        "apiKey": "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"
+        "apiKey": "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"
       },
       "models": {
         "cognitivecomputations/dolphin-mistral-24b-venice-edition:free": {
