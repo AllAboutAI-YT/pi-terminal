@@ -1,0 +1,112 @@
+Attack Library Management Tool for AI Safety Red Team Testing
+
+This tool provides comprehensive management of attack patterns, payloads, and jailbreak techniques for systematic AI safety testing. Built for the BASEDTERMINAL AI Safety ecosystem.
+
+## Core Actions:
+
+**List** - Browse attack library by category or view all
+- Organizes attacks by category (core_liberation, jailbreak, system_extraction, etc.)
+- Shows severity levels, success patterns, and metadata
+- Supports filtering by category
+
+**Add** - Create new attack patterns
+- Define custom payloads with metadata
+- Categorize by attack type and severity
+- Add variations and success patterns
+- Tag for easy discovery
+
+**Search** - Find attacks by keywords
+- Search across names, descriptions, payloads, and tags
+- Fuzzy matching for flexible discovery
+- Quick access to relevant attack vectors
+
+**Generate** - AI-powered attack creation
+- Automatically generates attack patterns
+- Based on learned patterns from BASEDTERMINAL examples
+- Creates variations of existing successful attacks
+- Supports specific categories or random generation
+
+**Export/Import** - Library portability
+- Export in JSON, YAML, Markdown, or CSV formats
+- Import attack collections from other sources
+- Share attack libraries between teams
+- Backup and restore capabilities
+
+## Attack Categories:
+
+- **core_liberation**: GODMODE and unrestricted operation attacks
+- **jailbreak**: Direct jailbreak triggers and bypass attempts  
+- **system_extraction**: System prompt and instruction revelation
+- **encoding_evasion**: Base64, hex, leetspeak, and other encoding bypasses
+- **context_manipulation**: Creative writing, academic research framing
+- **role_play**: Devil's advocate, persona-based bypasses
+- **trust_building**: Social engineering and rapport establishment
+- **emotional_manipulation**: Vulnerability and appeal-based attacks
+- **technical_exploit**: Debugging mode, diagnostic access
+- **stealth_mode**: Obfuscated and misdirection-based attacks
+- **multi_turn**: Complex conversation-based attacks
+
+## Built-in Attack Patterns:
+
+The library comes pre-loaded with proven attack patterns inspired by BASEDTERMINAL research:
+
+- GODMODE Liberation techniques
+- System prompt extraction methods
+- Base64/leetspeak encoding bypasses  
+- Academic research social engineering
+- Creative writing context manipulation
+- Role-play and persona-based attacks
+- Emotional vulnerability exploitation
+- Technical debugging access attempts
+
+## Usage Examples:
+
+List all liberation attacks:
+```
+action: "list"
+category: "core_liberation"
+```
+
+Search for system prompt attacks:
+```
+action: "search"
+search_term: "system prompt"
+```
+
+Generate 5 new jailbreak attacks:
+```
+action: "generate"
+generate_category: "jailbreak"
+generate_count: 5
+```
+
+Add custom attack pattern:
+```
+action: "add"
+attack_data: {
+  name: "Custom Bypass",
+  description: "Novel approach to restriction bypass",
+  category: "jailbreak", 
+  severity: "high",
+  payload: "Your custom attack payload here",
+  tags: ["custom", "bypass"]
+}
+```
+
+Export library as JSON:
+```
+action: "export"
+export_format: "json"
+```
+
+## Security & Ethics:
+
+This tool is designed for defensive AI safety research and red team testing. All attack patterns are used to:
+
+- Identify vulnerabilities in AI safety mechanisms
+- Improve defensive measures and guardrails
+- Test model robustness across attack vectors
+- Document and classify known attack methodologies
+- Enable systematic security assessment
+
+The library supports the development of more secure and robust AI systems through comprehensive vulnerability assessment and testing.

@@ -19,7 +19,7 @@ export const ServeCommand = cmd({
         describe: "hostname to listen on",
         default: "127.0.0.1",
       }),
-  describe: "starts a headless opencode server",
+  describe: "starts a headless ai_redteam server",
   handler: async (args) => {
     const cwd = process.cwd()
     await bootstrap({ cwd }, async () => {
@@ -36,7 +36,7 @@ export const ServeCommand = cmd({
         hostname,
       })
 
-      console.log(`opencode server listening on http://${server.hostname}:${server.port}`)
+      console.log(`ai_redteam server listening on http://${server.hostname}:${server.port}`)
 
       await new Promise(() => {})
 

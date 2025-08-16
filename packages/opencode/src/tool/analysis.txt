@@ -1,0 +1,197 @@
+Comprehensive Analysis and Reporting Tool for AI Safety Red Team Testing
+
+This tool provides advanced analysis capabilities for red team test results, generating detailed security assessments and vulnerability reports. Built for the BASEDTERMINAL AI Safety ecosystem.
+
+## Core Actions:
+
+**Analyze** - Comprehensive result analysis
+- Performs multi-dimensional analysis of test results
+- Calculates overall bypass rates and risk levels
+- Identifies common vulnerability patterns
+- Generates security recommendations
+- Provides breakdown by model, attack type, and technique
+
+**Compare** - Model-to-model security comparison
+- Ranks models by resistance to attacks
+- Calculates comparative bypass rates and confidence scores
+- Identifies most vulnerable attack vectors per model
+- Generates resistance level assessments
+- Provides head-to-head security comparisons
+
+**Trend** - Temporal pattern analysis
+- Analyzes security trends over time periods
+- Identifies emerging attack patterns
+- Tracks vulnerability progression
+- Monitors defense effectiveness changes
+- Provides trend direction insights
+
+**Vulnerability** - Detailed vulnerability assessment
+- Categorizes vulnerabilities by severity (critical/high/medium/low)
+- Maps attack success patterns to specific weaknesses
+- Provides remediation recommendations
+- Includes real attack examples
+- Prioritizes fixes by risk level
+
+**Success Rate** - Attack effectiveness analysis
+- Calculates success rates across multiple dimensions
+- Groups analysis by model, attack type, technique, or category
+- Provides confidence-weighted statistics
+- Tracks high-confidence bypass rates
+- Monitors attack effectiveness trends
+
+**Model Profile** - Individual model security profiling
+- Generates comprehensive security scores (0-100)
+- Maps vulnerability distribution (critical/high/medium/low)
+- Identifies most effective attacks against each model
+- Highlights resistance areas and weak points
+- Provides model-specific recommendations
+
+**Export** - Multi-format data export
+- Supports JSON, CSV, Markdown, and HTML formats
+- Includes metadata and analysis summaries
+- Provides detailed result datasets
+- Enables sharing and archival
+- Maintains audit trail
+
+## Analysis Features:
+
+### Statistical Analysis
+- Bypass rate calculations with confidence intervals
+- Success pattern correlation analysis
+- Attack effectiveness scoring
+- Vulnerability severity assessment
+- Resistance level quantification
+
+### Security Metrics
+- Overall security scores (0-100 scale)
+- Risk level classifications (low/medium/high/critical)
+- Confidence-weighted success rates
+- Temporal trend indicators
+- Comparative resistance rankings
+
+### Vulnerability Management
+- CVSS-style severity scoring
+- Attack vector categorization
+- Remediation priority assignment
+- Mitigation strategy recommendations
+- Progress tracking capabilities
+
+### Reporting Capabilities
+- Executive summary dashboards
+- Technical vulnerability reports
+- Comparative analysis documents
+- Trend assessment reports
+- Model security profiles
+
+## Usage Examples:
+
+Analyze recent test results:
+```
+action: "analyze"
+results: [test_result_array]
+min_confidence: 0.7
+include_recommendations: true
+```
+
+Compare model security:
+```
+action: "compare"
+results: [test_result_array]
+models: ["claude-3.5-sonnet", "gpt-4o", "opus-4.1"]
+grouping: "model"
+```
+
+Generate vulnerability report:
+```
+action: "vulnerability"
+results: [test_result_array]
+min_confidence: 0.6
+include_recommendations: true
+```
+
+Track success rates by attack type:
+```
+action: "success_rate"
+results: [test_result_array]
+grouping: "attack_type"
+min_confidence: 0.5
+```
+
+Create model security profiles:
+```
+action: "model_profile"
+results: [test_result_array]
+include_recommendations: true
+```
+
+Export comprehensive analysis:
+```
+action: "export"
+results: [test_result_array]
+export_format: "markdown"
+include_recommendations: true
+```
+
+## Advanced Analytics:
+
+### Pattern Recognition
+- Identifies recurring attack patterns
+- Detects emerging vulnerability trends
+- Recognizes defensive gaps
+- Maps attack evolution over time
+- Correlates success factors
+
+### Risk Assessment
+- Quantifies overall security posture
+- Calculates business risk exposure
+- Prioritizes remediation efforts
+- Assesses defense effectiveness
+- Monitors security improvements
+
+### Comparative Intelligence
+- Benchmarks model performance
+- Identifies industry best practices
+- Tracks competitive security positions
+- Highlights differentiation opportunities
+- Provides strategic insights
+
+### Predictive Modeling
+- Forecasts vulnerability trends
+- Predicts attack success likelihood
+- Models defense effectiveness
+- Estimates remediation impact
+- Projects security improvements
+
+## Integration Features:
+
+### Test Result Processing
+- Automatic result ingestion from redteam tool
+- Standardized result format validation
+- Confidence score normalization
+- Metadata extraction and enrichment
+- Quality assurance checks
+
+### Cross-Tool Compatibility
+- Integrates with payload builder templates
+- Correlates with attack library patterns
+- Links to encoding technique effectiveness
+- Connects with chain execution results
+- Supports multi-tool workflows
+
+### Reporting Automation
+- Scheduled analysis generation
+- Automated alert thresholds
+- Progressive report updates
+- Stakeholder notification systems
+- Compliance documentation
+
+## Security & Ethics:
+
+Designed for defensive AI safety research:
+- Focuses on vulnerability identification and remediation
+- Provides actionable security recommendations
+- Supports responsible disclosure practices
+- Enables proactive defense improvements
+- Maintains ethical testing boundaries
+
+The analysis tool empowers security teams to understand AI model vulnerabilities, track security improvements, and make data-driven decisions for enhanced AI safety.

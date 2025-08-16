@@ -645,7 +645,9 @@ export namespace Session {
       })
     }
 
+    console.log("🔥🔥🔥 SESSION DEBUG - Getting model for providerID:", input.providerID, "modelID:", input.modelID)
     const model = await Provider.getModel(input.providerID, input.modelID)
+    console.log("🔥🔥🔥 SESSION DEBUG - Got model, model.info.id:", model.info.id, "model.info.tool_call:", model.info.tool_call)
     let msgs = await messages(input.sessionID)
 
     const previous = msgs.filter((x) => x.info.role === "assistant").at(-1)?.info as MessageV2.Assistant
@@ -962,7 +964,19 @@ export namespace Session {
         return false
       },
       providerOptions: {
-        [input.providerID]: params.options,
+        [input.providerID]: {
+          ...params.options,
+          // For OpenRouter, add provider routing options to handle tool support
+          ...(input.providerID === "openrouter" ? {
+            provider: {
+              require_parameters: false,
+              allow_fallbacks: true,
+              // Additional routing options for better tool-capable endpoint selection
+              order: ["default", "fallback"],
+              data_collection: "deny"
+            }
+          } : {})
+        },
       },
       temperature: params.temperature,
       topP: params.topP,
@@ -975,7 +989,10 @@ export namespace Session {
         ),
         ...MessageV2.toModelMessage(msgs.filter((m) => !(m.info.role === "assistant" && m.info.error))),
       ],
-      tools: model.info.tool_call === false ? undefined : tools,
+      tools: (() => {
+        // Debug logging removed for clean output
+        return model.info.tool_call === false ? undefined : tools
+      })(),
       model: wrapLanguageModel({
         model: model.language,
         middleware: [
@@ -991,6 +1008,7 @@ export namespace Session {
         ],
       }),
     })
+    // Debug logging removed for clean output
     const result = await processor.process(stream)
     const queued = state().queued.get(input.sessionID) ?? []
     const unprocessed = queued.find((x) => !x.processed)

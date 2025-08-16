@@ -180,11 +180,14 @@ func (m *modelDialog) setupAllModels() {
 
 	m.allModels = make([]ModelWithProvider, 0)
 	for _, provider := range providers {
-		for _, model := range provider.Models {
-			m.allModels = append(m.allModels, ModelWithProvider{
-				Model:    model,
-				Provider: provider,
-			})
+		// Only show OpenRouter provider models
+		if provider.ID == "openrouter" {
+			for _, model := range provider.Models {
+				m.allModels = append(m.allModels, ModelWithProvider{
+					Model:    model,
+					Provider: provider,
+				})
+			}
 		}
 	}
 

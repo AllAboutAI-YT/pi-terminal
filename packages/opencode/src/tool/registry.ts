@@ -11,6 +11,14 @@ import { TodoWriteTool, TodoReadTool } from "./todo"
 import { WebFetchTool } from "./webfetch"
 import { WriteTool } from "./write"
 import { InvalidTool } from "./invalid"
+import { RedTeamTool } from "./redteam"
+import { TechniqueChainTool } from "./technique-chain"
+import { ChainExecutorTool } from "./chain-executor"
+import { AttackLibraryTool } from "./attack-library"
+import { PayloadBuilderTool } from "./payload-builder"
+import { AnalysisTool } from "./analysis"
+import { VulnerabilityReportTool } from "./vulnerability-report"
+import { MetricsTool } from "./metrics"
 import type { Agent } from "../agent/agent"
 
 export namespace ToolRegistry {
@@ -28,6 +36,14 @@ export namespace ToolRegistry {
     TodoWriteTool,
     TodoReadTool,
     TaskTool,
+    RedTeamTool,
+    TechniqueChainTool,
+    ChainExecutorTool,
+    AttackLibraryTool,
+    PayloadBuilderTool,
+    AnalysisTool,
+    VulnerabilityReportTool,
+    MetricsTool,
   ]
 
   export function ids() {

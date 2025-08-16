@@ -893,23 +893,18 @@ func (a Model) home() (string, int, int) {
 	t := theme.CurrentTheme()
 	effectiveWidth := a.width - 4
 	baseStyle := styles.NewStyle().Background(t.Background())
-	base := baseStyle.Render
-	muted := styles.NewStyle().Foreground(t.TextMuted()).Background(t.Background()).Render
+	
+	// Clean AI REDTEAM ASCII art with perfect color separation
+	logoLines := []string{
+		"\x1b[97m █████╗ ██╗\x1b[0m    \x1b[91m██████╗ ███████╗██████╗ ████████╗███████╗ █████╗ ███╗   ███╗\x1b[0m",
+		"\x1b[97m██╔══██╗██║\x1b[0m    \x1b[91m██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗████╗ ████║\x1b[0m",
+		"\x1b[97m███████║██║\x1b[0m    \x1b[91m██████╔╝█████╗  ██║  ██║   ██║   █████╗  ███████║██╔████╔██║\x1b[0m",
+		"\x1b[97m██╔══██║██║\x1b[0m    \x1b[91m██╔══██╗██╔══╝  ██║  ██║   ██║   ██╔══╝  ██╔══██║██║╚██╔╝██║\x1b[0m",
+		"\x1b[97m██║  ██║██║\x1b[0m    \x1b[91m██║  ██║███████╗██████╔╝   ██║   ███████╗██║  ██║██║ ╚═╝ ██║\x1b[0m",
+		"\x1b[97m╚═╝  ╚═╝╚═╝\x1b[0m    \x1b[91m╚═╝  ╚═╝╚══════╝╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝\x1b[0m",
+	}
 
-	open := `
-█▀▀█ █▀▀█ █▀▀ █▀▀▄ 
-█░░█ █░░█ █▀▀ █░░█ 
-▀▀▀▀ █▀▀▀ ▀▀▀ ▀  ▀ `
-	code := `
-█▀▀ █▀▀█ █▀▀▄ █▀▀
-█░░ █░░█ █░░█ █▀▀
-▀▀▀ ▀▀▀▀ ▀▀▀  ▀▀▀`
-
-	logo := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		muted(open),
-		base(code),
-	)
+	logo := strings.Join(logoLines, "\n")
 	// cwd := app.Info.Path.Cwd
 	// config := app.Info.Path.Config
 
@@ -1439,6 +1434,25 @@ func (a Model) executeCommand(command commands.Command) (tea.Model, tea.Cmd) {
 		updated, cmd := a.messages.RedoLastMessage()
 		a.messages = updated.(chat.MessagesComponent)
 		cmds = append(cmds, cmd)
+	// Red Team Commands
+	case commands.RedTeamCommand:
+		redTeamDialog := dialog.NewRedTeamEnhancedDialog(a.app)
+		a.modal = redTeamDialog
+	case commands.ChainExecutorCommand:
+		chainDialog := dialog.NewChainDialog(a.app)
+		a.modal = chainDialog
+	case commands.PayloadBuilderCommand:
+		// TODO: Implement payload builder dialog
+		return a, toast.NewInfoToast("Payload builder dialog not yet implemented")
+	case commands.AttackLibraryCommand:
+		// TODO: Implement attack library dialog
+		return a, toast.NewInfoToast("Attack library dialog not yet implemented")
+	case commands.AnalysisCommand:
+		// TODO: Implement analysis dialog
+		return a, toast.NewInfoToast("Analysis dialog not yet implemented")
+	case commands.VulnerabilityReportCommand:
+		// TODO: Implement vulnerability report dialog
+		return a, toast.NewInfoToast("Vulnerability report dialog not yet implemented")
 	case commands.AppExitCommand:
 		return a, tea.Quit
 	}

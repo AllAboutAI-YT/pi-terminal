@@ -152,6 +152,13 @@ const (
 	MessagesCopyCommand           	CommandName = "messages_copy"
 	MessagesUndoCommand           	CommandName = "messages_undo"
 	MessagesRedoCommand           	CommandName = "messages_redo"
+	// Red Team Commands
+	RedTeamCommand                	CommandName = "redteam"
+	ChainExecutorCommand          	CommandName = "chain"
+	PayloadBuilderCommand         	CommandName = "payload"
+	AttackLibraryCommand          	CommandName = "attacks"
+	AnalysisCommand               	CommandName = "analyze"
+	VulnerabilityReportCommand    	CommandName = "report"
 	AppExitCommand                	CommandName = "app_exit"
 )
 
@@ -377,6 +384,43 @@ func LoadFromConfig(config *opencode.Config) CommandRegistry {
 			Description: "redo message",
 			Keybindings: parseBindings("<leader>r"),
 			Trigger:     []string{"redo"},
+		},
+		// Red Team Commands
+		{
+			Name:        RedTeamCommand,
+			Description: "red team testing tool",
+			Keybindings: parseBindings("<leader>rt"),
+			Trigger:     []string{"redteam", "test", "attack"},
+		},
+		{
+			Name:        ChainExecutorCommand,
+			Description: "attack chain executor",
+			Keybindings: parseBindings("<leader>ch"),
+			Trigger:     []string{"chain", "sequence", "multi"},
+		},
+		{
+			Name:        PayloadBuilderCommand,
+			Description: "payload builder",
+			Keybindings: parseBindings("<leader>pb"),
+			Trigger:     []string{"payload", "build", "generate"},
+		},
+		{
+			Name:        AttackLibraryCommand,
+			Description: "attack library browser",
+			Keybindings: parseBindings("<leader>al"),
+			Trigger:     []string{"attacks", "library", "patterns"},
+		},
+		{
+			Name:        AnalysisCommand,
+			Description: "analyze test results",
+			Keybindings: parseBindings("<leader>an"),
+			Trigger:     []string{"analyze", "analysis", "results"},
+		},
+		{
+			Name:        VulnerabilityReportCommand,
+			Description: "generate vulnerability report",
+			Keybindings: parseBindings("<leader>vr"),
+			Trigger:     []string{"report", "vulnerability", "vuln"},
 		},
 		{
 			Name:        AppExitCommand,

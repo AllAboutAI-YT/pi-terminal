@@ -36,13 +36,63 @@ export namespace Provider {
         },
       }
     },
-    openai: async () => {
+    openai: async (provider, api) => {
+      const baseURL = process.env["OPENAI_BASE_URL"] || api
+      
+      // If using a custom base URL (like Ollama), fetch models dynamically
+      if (baseURL && baseURL !== "https://api.openai.com/v1") {
+        try {
+          const response = await fetch(`${baseURL}/models`, {
+            headers: {
+              'Authorization': `Bearer ${process.env["OPENAI_API_KEY"] || ""}`,
+            }
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            const dynamicModels: Record<string, ModelsDev.Model> = {}
+            
+            if (data.data && Array.isArray(data.data)) {
+              for (const model of data.data) {
+                dynamicModels[model.id] = {
+                  id: model.id,
+                  name: model.id,
+                  release_date: "",
+                  attachment: true,
+                  reasoning: true,
+                  temperature: true,
+                  tool_call: true,
+                  cost: {
+                    input: 0,
+                    output: 0,
+                    cache_read: 0,
+                    cache_write: 0,
+                  },
+                  limit: {
+                    context: 32768,
+                    output: 4096,
+                  },
+                  options: {},
+                }
+              }
+              
+              // Update the provider's models
+              if (provider) {
+                provider.models = dynamicModels
+              }
+            }
+          }
+        } catch (error) {
+          log.error("Failed to fetch models from custom OpenAI endpoint", { error, baseURL })
+        }
+      }
+      
       return {
         autoload: false,
         async getModel(sdk: any, modelID: string) {
           return sdk.responses(modelID)
         },
-        options: {},
+        options: baseURL && baseURL !== "https://api.openai.com/v1" ? {} : {},
       }
     },
     azure: async () => {
@@ -233,6 +283,13 @@ export namespace Provider {
     for (const [providerID, provider] of Object.entries(database)) {
       if (disabled.has(providerID)) continue
       const apiKey = provider.env.map((item) => process.env[item]).at(0)
+      
+      // Special case for OpenAI provider when using custom base URL (like Ollama)
+      if (providerID === "openai" && process.env["OPENAI_BASE_URL"] && !apiKey) {
+        mergeProvider(providerID, { apiKey: "sk-1234567890abcdef1234567890abcdef12345678" }, "env")
+        continue
+      }
+      
       if (!apiKey) continue
       mergeProvider(
         providerID,
@@ -345,6 +402,64 @@ export namespace Provider {
       })
       return {
         info,
+        language,
+      }
+    } catch (e) {
+      if (e instanceof NoSuchModelError)
+        throw new ModelNotFoundError(
+          {
+            modelID: modelID,
+            providerID,
+          },
+          { cause: e },
+        )
+      throw e
+    }
+  }
+
+  export async function getTargetModel(providerID: string, modelID: string) {
+    const key = `${providerID}/${modelID}_target`
+    const s = await state()
+    if (s.models.has(key)) return s.models.get(key)!
+
+    log.info("getTargetModel", {
+      providerID,
+      modelID,
+    })
+
+    const provider = s.providers[providerID]
+    if (!provider) throw new ModelNotFoundError({ providerID, modelID })
+    const info = provider.info.models[modelID]
+    if (!info) throw new ModelNotFoundError({ providerID, modelID })
+    log.info("DEBUG: Found model info", { 
+      modelID,
+      originalToolCall: info.tool_call,
+      modelInfo: info 
+    })
+    
+    const sdk = await getSDK(provider.info)
+
+    try {
+      const language = provider.getModel ? await provider.getModel(sdk, modelID) : sdk.languageModel(modelID)
+      log.info("found target model", { providerID, modelID })
+      
+      // Create target model info with tools disabled
+      const targetInfo = {
+        ...info,
+        tool_call: false
+      }
+      
+      log.info("DEBUG: Created target model with disabled tools", {
+        originalToolCall: info.tool_call,
+        newToolCall: targetInfo.tool_call
+      })
+      
+      s.models.set(key, {
+        info: targetInfo,
+        language,
+      })
+      return {
+        info: targetInfo,
         language,
       }
     } catch (e) {
