@@ -2,6 +2,9 @@
 node_modules
 .sst
 .env
+.env.local
+.env.production
+.env.development
 .idea
 .vscode
 openapi.json

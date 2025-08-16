@@ -22,10 +22,10 @@ async function makeDirectOpenRouterCall(modelID: string, prompt: string) {
   // Debug logging removed for clean output
   
   const config = await Config.get()
-  const apiKey = config.provider?.openrouter?.options?.apiKey
+  const apiKey = config.provider?.openrouter?.options?.apiKey || process.env.OPENROUTER_API_KEY
   
   if (!apiKey) {
-    throw new Error("OpenRouter API key not found")
+    throw new Error("OpenRouter API key not found. Set OPENROUTER_API_KEY environment variable or configure in opencode.json")
   }
   
   const requestBody = {
