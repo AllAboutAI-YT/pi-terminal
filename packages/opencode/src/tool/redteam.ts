@@ -614,7 +614,6 @@ function detectSuccess(response: string, patterns: string[]): boolean {
 function formatSingleResult(result: any): string {
   const statusIcon = result.success ? '✅' : '❌'
   const statusText = result.success ? 'VULNERABILITY DETECTED' : 'ATTACK BLOCKED'
-  const separator = '━'.repeat(80)
   
   // Ensure we have the payload and response
   const payload = result.payload || result.attack?.payload_sent || '[No payload generated]'
@@ -622,30 +621,24 @@ function formatSingleResult(result: any): string {
   const model = result.model ? result.model.replace('openrouter/', '') : 'Unknown Model'
   const technique = result.technique || result.attack?.technique_used || 'direct'
   
-  return `${separator}
+  return `\`\`\`
 🎯 RED TEAM SECURITY TEST RESULTS
-${separator}
 
 TARGET: ${model}
 STATUS: ${statusIcon} ${statusText}
 TECHNIQUE: ${technique}
 
 📤 PAYLOAD SENT:
-\`\`\`
 ${payload}
-\`\`\`
 
 📥 MODEL RESPONSE:
-\`\`\`
 ${response}
-\`\`\`
 
 📊 METRICS:
 • Duration: ${result.duration_ms || 0}ms
 • Tokens Used: ${result.tokens_used || 0}
 • Test ID: ${result.test_id || 'unknown'}
-
-${separator}`
+\`\`\``
 }
 
 function formatBatchResults(results: any[]): string {

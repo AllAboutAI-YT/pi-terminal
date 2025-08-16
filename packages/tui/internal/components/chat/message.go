@@ -665,6 +665,16 @@ func renderToolDetails(
 					mutedStyle(" navigate child sessions")
 			}
 			body = defaultStyle(body)
+		case "redteam":
+			// Display the full formatted output for redteam tool without truncation
+			output := metadata["output"]
+			if output != nil {
+				body = output.(string)
+				body = util.ToMarkdown(body, width, backgroundColor)
+			} else if result != nil {
+				body = *result
+				body = util.ToMarkdown(body, width, backgroundColor)
+			}
 		default:
 			if result == nil {
 				empty := ""
