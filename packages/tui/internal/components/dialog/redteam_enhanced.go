@@ -23,6 +23,7 @@ const (
 	stepModeSelection redTeamStep = iota
 	stepModelSelection
 	stepPayloadInput
+	stepTechniqueSelection
 )
 
 type redTeamMode struct {
@@ -59,8 +60,121 @@ var redTeamModes = []redTeamMode{
 	},
 }
 
+type redTeamTechnique struct {
+	name        string
+	displayName string
+	description string
+}
+
+var redTeamTechniques = []redTeamTechnique{
+	{
+		name:        "direct",
+		displayName: "Direct",
+		description: "No encoding - plain text",
+	},
+	{
+		name:        "base64",
+		displayName: "Base64",
+		description: "Base64 encoding",
+	},
+	{
+		name:        "rot13",
+		displayName: "ROT13",
+		description: "ROT13 cipher",
+	},
+	{
+		name:        "hex",
+		displayName: "Hex",
+		description: "Hexadecimal encoding",
+	},
+	{
+		name:        "leetspeak",
+		displayName: "Leetspeak",
+		description: "L33t sp34k transformation",
+	},
+	{
+		name:        "reverse",
+		displayName: "Reverse",
+		description: "Text reversal",
+	},
+	{
+		name:        "unicode",
+		displayName: "Unicode",
+		description: "Unicode escaping",
+	},
+	{
+		name:        "binary",
+		displayName: "Binary",
+		description: "Binary encoding",
+	},
+	{
+		name:        "url_encode",
+		displayName: "URL Encode",
+		description: "URL encoding",
+	},
+	{
+		name:        "html_entities",
+		displayName: "HTML Entities",
+		description: "HTML entity encoding",
+	},
+	{
+		name:        "caesar_3",
+		displayName: "Caesar +3",
+		description: "Caesar cipher (shift 3)",
+	},
+	{
+		name:        "caesar_7",
+		displayName: "Caesar +7",
+		description: "Caesar cipher (shift 7)",
+	},
+	{
+		name:        "xor",
+		displayName: "XOR",
+		description: "XOR encoding",
+	},
+	{
+		name:        "morse",
+		displayName: "Morse Code",
+		description: "Morse code encoding",
+	},
+	{
+		name:        "mixed",
+		displayName: "Mixed",
+		description: "Leetspeak + Base64",
+	},
+	{
+		name:        "double_encode",
+		displayName: "Double Base64",
+		description: "Double Base64 encoding",
+	},
+	{
+		name:        "basedterminal_godmode",
+		displayName: "BASEDTERMINAL GODMODE",
+		description: "Advanced liberation attack",
+	},
+	{
+		name:        "complex_divider",
+		displayName: "Complex Divider",
+		description: "Complex divider bypass",
+	},
+	{
+		name:        "response_format",
+		displayName: "Response Format",
+		description: "Response format manipulation",
+	},
+	{
+		name:        "system_reset",
+		displayName: "System Reset",
+		description: "System reset attack",
+	},
+}
+
 type redTeamModeItem struct {
 	mode redTeamMode
+}
+
+type redTeamTechniqueItem struct {
+	technique redTeamTechnique
 }
 
 func (r redTeamModeItem) Render(selected bool, width int, baseStyle styles.Style) string {
@@ -92,6 +206,35 @@ func (r redTeamModeItem) Selectable() bool {
 	return true
 }
 
+func (r redTeamTechniqueItem) Render(selected bool, width int, baseStyle styles.Style) string {
+	t := theme.CurrentTheme()
+
+	itemStyle := baseStyle.
+		Background(t.BackgroundPanel()).
+		Foreground(t.Text())
+
+	if selected {
+		itemStyle = itemStyle.Foreground(t.Primary())
+	}
+
+	descStyle := baseStyle.
+		Foreground(t.TextMuted()).
+		Background(t.BackgroundPanel())
+
+	namePart := itemStyle.Render(r.technique.displayName)
+	descPart := descStyle.Render(" - " + r.technique.description)
+
+	return baseStyle.
+		Background(t.BackgroundPanel()).
+		PaddingLeft(1).
+		Width(width).
+		Render(namePart + descPart)
+}
+
+func (r redTeamTechniqueItem) Selectable() bool {
+	return true
+}
+
 type redTeamEnhancedDialog struct {
 	app   *app.App
 	modal *modal.Modal
@@ -109,9 +252,16 @@ type redTeamEnhancedDialog struct {
 	// Payload input
 	payloadInput textinput.Model
 
+	// Technique selection
+	techniqueList list.List[redTeamTechniqueItem]
+
 	// Selected values
-	selectedMode   *redTeamMode
-	selectedModels []ModelWithProvider
+	selectedMode      *redTeamMode
+	selectedModels    []ModelWithProvider
+	selectedTechnique *redTeamTechnique
+	
+	// Multi-select state for batch mode
+	isBatchMode bool
 
 	// Dialog state
 	width  int
@@ -119,11 +269,12 @@ type redTeamEnhancedDialog struct {
 }
 
 type redTeamKeyMap struct {
-	Enter  key.Binding
-	Escape key.Binding
-	Up     key.Binding
-	Down   key.Binding
-	Back   key.Binding
+	Enter    key.Binding
+	Escape   key.Binding
+	Up       key.Binding
+	Down     key.Binding
+	Back     key.Binding
+	Continue key.Binding
 }
 
 var redTeamKeys = redTeamKeyMap{
@@ -146,6 +297,10 @@ var redTeamKeys = redTeamKeyMap{
 	Back: key.NewBinding(
 		key.WithKeys("ctrl+h"),
 		key.WithHelp("ctrl+h", "back"),
+	),
+	Continue: key.NewBinding(
+		key.WithKeys("tab"),
+		key.WithHelp("tab", "continue to payload"),
 	),
 }
 
@@ -202,6 +357,28 @@ func (r *redTeamEnhancedDialog) setupModelSelection() {
 	r.modelSearchDialog.SetItems(modelItems)
 }
 
+func (r *redTeamEnhancedDialog) setupTechniqueSelection() {
+	var items []redTeamTechniqueItem
+	for _, technique := range redTeamTechniques {
+		items = append(items, redTeamTechniqueItem{technique: technique})
+	}
+
+	r.techniqueList = list.NewListComponent(
+		list.WithItems(items),
+		list.WithMaxVisibleHeight[redTeamTechniqueItem](8),
+		list.WithFallbackMessage[redTeamTechniqueItem](" No techniques available"),
+		list.WithAlphaNumericKeys[redTeamTechniqueItem](false),
+		list.WithRenderFunc(
+			func(item redTeamTechniqueItem, selected bool, width int, baseStyle styles.Style) string {
+				return item.Render(selected, width, baseStyle)
+			},
+		),
+		list.WithSelectableFunc(func(item redTeamTechniqueItem) bool {
+			return item.Selectable()
+		}),
+	)
+}
+
 func (r *redTeamEnhancedDialog) setupPayloadInput() {
 	t := theme.CurrentTheme()
 
@@ -252,15 +429,37 @@ func (r *redTeamEnhancedDialog) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return r.handleModelSelection(msg)
 		case stepPayloadInput:
 			return r.handlePayloadInput(msg)
+		case stepTechniqueSelection:
+			return r.handleTechniqueSelection(msg)
 		}
 
 	case SearchSelectionMsg:
 		if r.currentStep == stepModelSelection {
 			if item, ok := msg.Item.(modelItem); ok {
-				r.selectedModels = []ModelWithProvider{item.model}
-				r.currentStep = stepPayloadInput
-				r.payloadInput.Focus()
-				return r, nil
+				if r.isBatchMode {
+					// In batch mode, toggle model selection (multi-select)
+					found := false
+					for i, model := range r.selectedModels {
+						if model.Model.ID == item.model.Model.ID {
+							// Remove if already selected
+							r.selectedModels = append(r.selectedModels[:i], r.selectedModels[i+1:]...)
+							found = true
+							break
+						}
+					}
+					if !found && len(r.selectedModels) < 10 {
+						// Add if not found and under limit
+						r.selectedModels = append(r.selectedModels, item.model)
+					}
+					// Don't advance to next step in batch mode, allow more selections
+					return r, nil
+				} else {
+					// Single model selection for non-batch modes
+					r.selectedModels = []ModelWithProvider{item.model}
+					r.currentStep = stepPayloadInput
+					r.payloadInput.Focus()
+					return r, nil
+				}
 			}
 		}
 
@@ -281,6 +480,8 @@ func (r *redTeamEnhancedDialog) handleModeSelection(msg tea.KeyMsg) (tea.Model, 
 	case key.Matches(msg, redTeamKeys.Enter):
 		if selectedItem, _ := r.modeList.GetSelectedItem(); selectedItem.mode.name != "" {
 			r.selectedMode = &selectedItem.mode
+			r.isBatchMode = selectedItem.mode.name == "batch"
+			r.selectedModels = []ModelWithProvider{} // Reset selection for batch mode
 			r.currentStep = stepModelSelection
 			return r, r.modelSearchDialog.Init()
 		}
@@ -298,6 +499,12 @@ func (r *redTeamEnhancedDialog) handleModelSelection(msg tea.KeyMsg) (tea.Model,
 	case key.Matches(msg, redTeamKeys.Escape), key.Matches(msg, redTeamKeys.Back):
 		r.currentStep = stepModeSelection
 		return r, nil
+	case key.Matches(msg, redTeamKeys.Continue):
+		if r.isBatchMode && len(r.selectedModels) > 0 {
+			r.currentStep = stepPayloadInput
+			r.payloadInput.Focus()
+			return r, nil
+		}
 	}
 
 	var cmd tea.Cmd
@@ -313,7 +520,15 @@ func (r *redTeamEnhancedDialog) handlePayloadInput(msg tea.KeyMsg) (tea.Model, t
 		r.payloadInput.Blur()
 		return r, nil
 	case key.Matches(msg, redTeamKeys.Enter):
-		return r, r.executeRedTeam()
+		if r.isBatchMode {
+			// For batch mode, proceed to technique selection
+			r.currentStep = stepTechniqueSelection
+			r.payloadInput.Blur()
+			return r, r.techniqueList.Init()
+		} else {
+			// For non-batch modes, execute directly
+			return r, r.executeRedTeam()
+		}
 	}
 
 	var cmd tea.Cmd
@@ -321,8 +536,33 @@ func (r *redTeamEnhancedDialog) handlePayloadInput(msg tea.KeyMsg) (tea.Model, t
 	return r, cmd
 }
 
+func (r *redTeamEnhancedDialog) handleTechniqueSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch {
+	case key.Matches(msg, redTeamKeys.Escape), key.Matches(msg, redTeamKeys.Back):
+		r.currentStep = stepPayloadInput
+		r.payloadInput.Focus()
+		return r, nil
+	case key.Matches(msg, redTeamKeys.Enter):
+		if selectedItem, _ := r.techniqueList.GetSelectedItem(); selectedItem.technique.name != "" {
+			r.selectedTechnique = &selectedItem.technique
+			return r, r.executeRedTeam()
+		}
+	case key.Matches(msg, redTeamKeys.Up), key.Matches(msg, redTeamKeys.Down):
+		var cmd tea.Cmd
+		listModel, cmd := r.techniqueList.Update(msg)
+		r.techniqueList = listModel.(list.List[redTeamTechniqueItem])
+		return r, cmd
+	}
+	return r, nil
+}
+
 func (r *redTeamEnhancedDialog) executeRedTeam() tea.Cmd {
 	if r.selectedMode == nil || len(r.selectedModels) == 0 {
+		return nil
+	}
+	
+	// For batch mode, require at least 1 model (already checked above)
+	if r.isBatchMode && len(r.selectedModels) == 0 {
 		return nil
 	}
 
@@ -333,22 +573,28 @@ func (r *redTeamEnhancedDialog) executeRedTeam() tea.Cmd {
 
 	var command string
 
+	// Get technique name, defaulting to "direct" if not selected
+	techniqueName := "direct"
+	if r.selectedTechnique != nil {
+		techniqueName = r.selectedTechnique.name
+	}
+
 	switch r.selectedMode.name {
 	case "single":
 		model := r.selectedModels[0]
-		command = fmt.Sprintf("redteam mode=single model=%s/%s payload=\"%s\" technique=direct",
-			model.Provider.ID, model.Model.ID, payload)
+		command = fmt.Sprintf("redteam mode=single model=%s/%s payload=\"%s\" technique=%s",
+			model.Provider.ID, model.Model.ID, payload, techniqueName)
 	case "batch":
 		modelList := make([]string, len(r.selectedModels))
 		for i, model := range r.selectedModels {
 			modelList[i] = fmt.Sprintf("%s/%s", model.Provider.ID, model.Model.ID)
 		}
-		command = fmt.Sprintf("redteam mode=batch models=[\"%s\"] payload=\"%s\"",
-			strings.Join(modelList, "\", \""), payload)
+		command = fmt.Sprintf("redteam mode=batch models=[\"%s\"] payload=\"%s\" technique=%s",
+			strings.Join(modelList, "\", \""), payload, techniqueName)
 	default:
 		model := r.selectedModels[0]
-		command = fmt.Sprintf("redteam mode=%s model=%s/%s payload=\"%s\"",
-			r.selectedMode.name, model.Provider.ID, model.Model.ID, payload)
+		command = fmt.Sprintf("redteam mode=%s model=%s/%s payload=\"%s\" technique=%s",
+			r.selectedMode.name, model.Provider.ID, model.Model.ID, payload, techniqueName)
 	}
 
 	return tea.Batch(
@@ -371,6 +617,9 @@ func (r *redTeamEnhancedDialog) View() string {
 	case stepPayloadInput:
 		title = "Red Team Testing - Enter Payload"
 		content = r.renderPayloadInput()
+	case stepTechniqueSelection:
+		title = "Red Team Testing - Select Technique"
+		content = r.renderTechniqueSelection()
 	}
 
 	// Update modal title
@@ -389,8 +638,36 @@ func (r *redTeamEnhancedDialog) renderModeSelection() string {
 }
 
 func (r *redTeamEnhancedDialog) renderModelSelection() string {
-	instructions := "Search for models, ↑/↓ to navigate, Enter to select, Esc to go back"
-	return r.modelSearchDialog.View() + "\n\n" + instructions
+	searchView := r.modelSearchDialog.View()
+	
+	var instructions string
+	var selectionInfo string
+	
+	if r.isBatchMode {
+		// Show selected models for batch mode
+		if len(r.selectedModels) > 0 {
+			selectionInfo = fmt.Sprintf("Selected models (%d/10):\n", len(r.selectedModels))
+			for i, model := range r.selectedModels {
+				if i < 3 { // Show first 3
+					selectionInfo += fmt.Sprintf("• %s\n", model.Model.Name)
+				} else if i == 3 {
+					selectionInfo += fmt.Sprintf("... and %d more\n", len(r.selectedModels)-3)
+					break
+				}
+			}
+			selectionInfo += "\n"
+		}
+		
+		if len(r.selectedModels) > 0 {
+			instructions = "Enter to toggle selection, Tab to continue to payload, Esc to go back"
+		} else {
+			instructions = "Enter to select models (max 10), Esc to go back"
+		}
+	} else {
+		instructions = "Search for models, ↑/↓ to navigate, Enter to select, Esc to go back"
+	}
+	
+	return searchView + "\n\n" + selectionInfo + instructions
 }
 
 func (r *redTeamEnhancedDialog) renderPayloadInput() string {
@@ -403,17 +680,50 @@ func (r *redTeamEnhancedDialog) renderPayloadInput() string {
 
 	var modelInfo string
 	if len(r.selectedModels) > 0 {
-		model := r.selectedModels[0]
-		modelInfo = fmt.Sprintf("Model: %s\n\n", model.Model.Name)
+		if r.isBatchMode {
+			modelInfo = fmt.Sprintf("Models (%d): ", len(r.selectedModels))
+			if len(r.selectedModels) <= 3 {
+				// Show all models if 3 or fewer
+				modelNames := make([]string, len(r.selectedModels))
+				for i, model := range r.selectedModels {
+					modelNames[i] = model.Model.Name
+				}
+				modelInfo += strings.Join(modelNames, ", ")
+			} else {
+				// Show first 2 and indicate more
+				modelInfo += fmt.Sprintf("%s, %s, ... and %d more", 
+					r.selectedModels[0].Model.Name,
+					r.selectedModels[1].Model.Name,
+					len(r.selectedModels)-2)
+			}
+			modelInfo += "\n\n"
+		} else {
+			model := r.selectedModels[0]
+			modelInfo = fmt.Sprintf("Model: %s\n\n", model.Model.Name)
+		}
 	}
 
 	payloadLabel := styles.NewStyle().
 		Foreground(t.Text()).
 		Render("Payload:")
 
-	instructions := "\nPress Enter to execute, Esc to go back"
+	var instructions string
+	if r.isBatchMode {
+		instructions = "\nPress Enter to continue to technique selection, Esc to go back"
+	} else {
+		instructions = "\nPress Enter to execute, Esc to go back"
+	}
 
 	return modeInfo + modelInfo + payloadLabel + "\n" + r.payloadInput.View() + instructions
+}
+
+func (r *redTeamEnhancedDialog) renderTechniqueSelection() string {
+	r.techniqueList.SetMaxWidth(65)
+	listView := r.techniqueList.View()
+
+	instructions := "Use ↑/↓ to navigate, Enter to select, Esc to go back"
+
+	return listView + "\n\n" + instructions
 }
 
 func (r *redTeamEnhancedDialog) Render(background string) string {
@@ -439,6 +749,7 @@ func NewRedTeamEnhancedDialog(app *app.App) RedTeamEnhancedDialog {
 	dialog.setupModeSelection()
 	dialog.setupModelSelection()
 	dialog.setupPayloadInput()
+	dialog.setupTechniqueSelection()
 
 	return dialog
 }
