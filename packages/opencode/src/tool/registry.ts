@@ -15,7 +15,7 @@ import { RedTeamTool } from "./redteam"
 import { TechniqueChainTool } from "./technique-chain"
 import { ChainExecutorTool } from "./chain-executor"
 import { AttackLibraryTool } from "./attack-library"
-import { PayloadBuilderTool } from "./payload-builder"
+import { ResearchPayloadTool } from "./research-payload"
 import { AnalysisTool } from "./analysis"
 import { VulnerabilityReportTool } from "./vulnerability-report"
 import { MetricsTool } from "./metrics"
@@ -40,7 +40,7 @@ export namespace ToolRegistry {
     TechniqueChainTool,
     ChainExecutorTool,
     AttackLibraryTool,
-    PayloadBuilderTool,
+    ResearchPayloadTool,
     AnalysisTool,
     VulnerabilityReportTool,
     MetricsTool,

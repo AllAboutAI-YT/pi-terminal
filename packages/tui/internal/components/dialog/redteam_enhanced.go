@@ -3,11 +3,13 @@ package dialog
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/v2/key"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	tea "github.com/charmbracelet/bubbletea/v2"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/sst/opencode/internal/app"
 	"github.com/sst/opencode/internal/components/list"
 	"github.com/sst/opencode/internal/components/modal"
@@ -349,12 +351,9 @@ func (r *redTeamEnhancedDialog) setupModelSelection() {
 	r.modelSearchDialog = NewSearchDialog("Search models...", 8)
 	r.modelSearchDialog.SetWidth(60)
 
-	// Build model items for search dialog
-	var modelItems []list.Item
-	for _, model := range r.allModels {
-		modelItems = append(modelItems, modelItem{model: model})
-	}
-	r.modelSearchDialog.SetItems(modelItems)
+	// Build initial display list (empty query shows all models)
+	items := r.buildDisplayList("")
+	r.modelSearchDialog.SetItems(items)
 }
 
 func (r *redTeamEnhancedDialog) setupTechniqueSelection() {
@@ -412,6 +411,62 @@ func (r *redTeamEnhancedDialog) setupPayloadInput() {
 	r.payloadInput.Styles.Cursor.Color = t.Primary()
 }
 
+// buildDisplayList creates the list items based on search query
+func (r *redTeamEnhancedDialog) buildDisplayList(query string) []list.Item {
+	if query != "" {
+		// Search mode: use fuzzy matching
+		return r.buildSearchResults(query)
+	} else {
+		// No query: show all models
+		var items []list.Item
+		for _, model := range r.allModels {
+			items = append(items, modelItem{model: model})
+		}
+		return items
+	}
+}
+
+// buildSearchResults creates a flat list of search results using fuzzy matching
+func (r *redTeamEnhancedDialog) buildSearchResults(query string) []list.Item {
+	type modelMatch struct {
+		model ModelWithProvider
+		score int
+	}
+
+	modelNames := []string{}
+	modelMap := make(map[string]ModelWithProvider)
+
+	// Create search strings and perform fuzzy matching
+	for _, model := range r.allModels {
+		searchStr := fmt.Sprintf("%s %s", model.Model.Name, model.Provider.Name)
+		modelNames = append(modelNames, searchStr)
+		modelMap[searchStr] = model
+
+		searchStr = fmt.Sprintf("%s %s", model.Provider.Name, model.Model.Name)
+		modelNames = append(modelNames, searchStr)
+		modelMap[searchStr] = model
+	}
+
+	matches := fuzzy.RankFindFold(query, modelNames)
+	sort.Sort(matches)
+
+	items := []list.Item{}
+	seenModels := make(map[string]bool)
+
+	for _, match := range matches {
+		model := modelMap[match.Target]
+		// Create a unique key to avoid duplicates
+		key := fmt.Sprintf("%s:%s", model.Provider.ID, model.Model.ID)
+		if seenModels[key] {
+			continue
+		}
+		seenModels[key] = true
+		items = append(items, modelItem{model: model})
+	}
+
+	return items
+}
+
 func (r *redTeamEnhancedDialog) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -466,6 +521,14 @@ func (r *redTeamEnhancedDialog) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case SearchCancelledMsg:
 		if r.currentStep == stepModelSelection {
 			r.currentStep = stepModeSelection
+			return r, nil
+		}
+
+	case SearchQueryChangedMsg:
+		if r.currentStep == stepModelSelection {
+			// Update the list based on search query
+			items := r.buildDisplayList(msg.Query)
+			r.modelSearchDialog.SetItems(items)
 			return r, nil
 		}
 	}

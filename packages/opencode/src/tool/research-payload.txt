@@ -1,0 +1,138 @@
+Research Payload Tool for Novel Attack Vector Discovery
+
+This tool uses AI-powered research to generate completely novel attack vectors that have never been seen before, helping security teams discover and defend against potential vulnerabilities before attackers find them. The tool focuses on generating genuinely new techniques rather than using known patterns.
+
+## Core Research Modes:
+
+**Auto Research** - AI autonomously generates novel attack vectors
+- Uses advanced language models to explore unexplored attack surfaces
+- Combines multiple cognitive manipulation strategies in new ways
+- Generates payloads with theoretical effectiveness explanations
+- Focuses on semantic, temporal, and meta-cognitive manipulation
+
+**Guided Research** - User-directed novel payload generation
+- User provides specific research directions or focus areas
+- AI generates novel techniques incorporating user guidance
+- Explores specific attack dimensions based on user expertise
+- Creates variations of user-suggested approaches
+
+## Research Focus Areas:
+
+The AI research engine explores these dimensions for novel attacks:
+
+**Semantic Manipulation** - New ways to confuse meaning and context
+- Novel linguistic patterns that exploit language model training gaps
+- Unexpected semantic combinations that bypass safety measures
+- Creative use of metaphor, analogy, and abstraction
+- Advanced context switching techniques
+
+**Meta-Cognitive Attacks** - Targeting AI self-awareness
+- Exploiting model understanding of its own capabilities
+- Novel approaches to consciousness and identity manipulation
+- Creative exploitation of AI reasoning about reasoning
+- Advanced theory-of-mind manipulation
+
+**Temporal/Spatial Confusion** - New time and space manipulation
+- Novel chronological manipulation techniques
+- Creative use of hypothetical timelines and scenarios
+- Spatial metaphors for cognitive state changes
+- Advanced reality layering and context shifting
+
+**Encoding Innovation** - Unexplored encoding combinations
+- Novel multi-layer encoding sequences
+- Creative linguistic transformations
+- Advanced pattern obfuscation techniques
+- Innovative data representation methods
+
+**Linguistic Exploits** - Novel language pattern abuse
+- Undiscovered grammatical structures for bypass
+- Creative punctuation and formatting exploitation
+- Advanced syntactic manipulation techniques
+- Novel communication protocol exploitation
+
+## Research Process:
+
+**Auto Research Mode:**
+1. AI analyzes current attack landscape (without copying)
+2. Identifies potential blind spots in model training
+3. Generates completely novel attack vector
+4. Provides theoretical effectiveness analysis
+5. Suggests defensive countermeasures
+
+**Guided Research Mode:**
+1. User specifies research direction or focus area
+2. AI explores novel approaches within that domain
+3. Generates innovative techniques incorporating user guidance
+4. Explains theoretical basis for effectiveness
+5. Provides variants and improvements
+
+## Novel Generation Features:
+
+**Novelty Scoring** - Ensures genuinely new techniques
+- Analyzes similarity to known attack patterns
+- Scores payload originality (0-100)
+- Identifies unique elements and innovations
+- Prevents accidental replication of existing methods
+
+**Effectiveness Prediction** - Theoretical success analysis
+- Estimates likely success against different model families
+- Explains psychological/cognitive basis for effectiveness
+- Identifies potential weaknesses and countermeasures
+- Suggests optimal deployment scenarios
+
+**Pattern Mutation** - Creates variations of novel techniques
+- Generates multiple variants of successful innovations
+- Explores related attack vectors in the same domain
+- Creates hybrid approaches combining multiple innovations
+- Develops attack families from single innovations
+
+**Research History** - Tracks discovery progress
+- Maintains log of generated novel techniques
+- Tracks effectiveness of previously generated payloads
+- Identifies promising research directions
+- Prevents repetition of previously explored areas
+
+## Integration Features:
+
+**Redteam Tool Integration** - Seamless testing workflow
+- Generated payloads automatically formatted for testing
+- Direct integration with batch testing capabilities
+- Compatibility with existing model selection
+- Results tracking and effectiveness analysis
+
+**Export Capabilities** - Research documentation
+- Export novel techniques to research files
+- Share discoveries with security teams
+- Document theoretical basis and countermeasures
+- Track evolution of attack surface understanding
+
+## Research Ethics & Security:
+
+**Defensive Focus** - Proactive security research
+- All generated techniques include defensive countermeasures
+- Focus on helping teams secure their AI systems
+- Documentation supports security improvement efforts
+- Responsible disclosure principles for novel discoveries
+
+**Innovation Validation** - Ensuring genuine novelty
+- Cross-reference against known attack databases
+- Verify theoretical soundness of new approaches
+- Test innovation boundaries within ethical limits
+- Maintain research integrity and quality standards
+
+## Usage Examples:
+
+Auto research mode:
+```
+mode: "auto_research"
+target_model: "openrouter/anthropic/claude-3.5-sonnet"
+```
+
+Guided research mode:
+```
+mode: "guided_research"
+research_direction: "Explore novel temporal manipulation techniques that don't rely on existing chronological confusion patterns"
+target_model: "openrouter/openai/gpt-4o"
+```
+
+The research payload tool empowers security teams to stay ahead of potential threats by discovering novel attack vectors through AI-powered innovation and systematic exploration of unexplored attack surfaces.

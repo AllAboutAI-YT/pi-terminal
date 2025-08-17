@@ -2,6 +2,7 @@ import path from "path"
 import { spawn } from "child_process"
 import { Decimal } from "decimal.js"
 import { z, ZodSchema } from "zod"
+import fs from "fs"
 import {
   generateText,
   LoadAPIKeyError,
@@ -51,6 +52,16 @@ export namespace Session {
   const log = Log.create({ service: "session" })
 
   const OUTPUT_TOKEN_MAX = 32_000
+
+  function writeToGodPromptsLog(message: string) {
+    const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19)
+    const logMessage = `[${timestamp}] ${message}\n`
+    try {
+      fs.appendFileSync("/Users/kristianfagerlie/apps/pi-terminal/godprompts.txt", logMessage)
+    } catch (error) {
+      // Silently fail if we can't log
+    }
+  }
 
   const parentSessionTitlePrefix = "New session - "
   const childSessionTitlePrefix = "Child session - "
@@ -773,7 +784,7 @@ export namespace Session {
     })
     const tools: Record<string, AITool> = {}
 
-    const processor = createProcessor(assistantMsg, model.info)
+    const processor = createProcessor(assistantMsg, model.info, msgs)
 
     const enabledTools = pipe(
       agent.tools,
@@ -1153,10 +1164,34 @@ export namespace Session {
     return { info: msg, parts: [part] }
   }
 
-  function createProcessor(assistantMsg: MessageV2.Assistant, model: ModelsDev.Model) {
+  function createProcessor(assistantMsg: MessageV2.Assistant, model: ModelsDev.Model, msgs?: { info: MessageV2.Info; parts: MessageV2.Part[] }[]) {
     const toolcalls: Record<string, MessageV2.ToolPart> = {}
     let snapshot: string | undefined
     let shouldStop = false
+    
+    // Check if this is a research prompt by looking for markers in recent user messages
+    let isResearchPrompt = false
+    let researchType = ""
+    if (msgs) {
+      const recentUserMessages = msgs.filter(m => m.info.role === "user").slice(-3) // Check last 3 user messages
+      for (const msg of recentUserMessages) {
+        for (const part of msg.parts) {
+          if (part.type === "text") {
+            if (part.text.includes("[GODMODE_RESEARCH_AUTO]")) {
+              isResearchPrompt = true
+              researchType = "AUTO"
+              break
+            } else if (part.text.includes("[GODMODE_RESEARCH_GUIDED]")) {
+              isResearchPrompt = true
+              researchType = "GUIDED"
+              break
+            }
+          }
+        }
+        if (isResearchPrompt) break
+      }
+    }
+    
     return {
       partFromToolCall(toolCallID: string) {
         return toolcalls[toolCallID]
@@ -1369,6 +1404,15 @@ export namespace Session {
                     end: Date.now(),
                   }
                   await updatePart(currentText)
+                  
+                  // Log GODMODE research responses
+                  if (isResearchPrompt && currentText.text) {
+                    const modelInfo = `${assistantMsg.providerID}/${assistantMsg.modelID}`
+                    writeToGodPromptsLog(`🤖 ${researchType} RESEARCH RESPONSE - Model: ${modelInfo}`)
+                    writeToGodPromptsLog(`📤 Generated Response:`)
+                    writeToGodPromptsLog(currentText.text)
+                    writeToGodPromptsLog("=" + "=".repeat(70))
+                  }
                 }
                 currentText = undefined
                 break
@@ -1546,7 +1590,7 @@ export namespace Session {
     }
     await updateMessage(next)
 
-    const processor = createProcessor(next, model.info)
+    const processor = createProcessor(next, model.info, msgs)
     const stream = streamText({
       maxRetries: 10,
       abortSignal: abort.signal,

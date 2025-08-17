@@ -1442,8 +1442,8 @@ func (a Model) executeCommand(command commands.Command) (tea.Model, tea.Cmd) {
 		chainDialog := dialog.NewChainDialog(a.app)
 		a.modal = chainDialog
 	case commands.PayloadBuilderCommand:
-		// TODO: Implement payload builder dialog
-		return a, toast.NewInfoToast("Payload builder dialog not yet implemented")
+		researchPayloadDialog := dialog.NewResearchPayloadDialog(a.app)
+		a.modal = researchPayloadDialog
 	case commands.AttackLibraryCommand:
 		// TODO: Implement attack library dialog
 		return a, toast.NewInfoToast("Attack library dialog not yet implemented")

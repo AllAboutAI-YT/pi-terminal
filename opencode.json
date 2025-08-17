@@ -3,7 +3,7 @@
   "provider": {
     "openrouter": {
       "options": {
-        "apiKey": "{env:OPENROUTER_API_KEY}"
+        "apiKey": "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"
       },
       "models": {
         "cognitivecomputations/dolphin-mistral-24b-venice-edition:free": {
@@ -102,16 +102,6 @@
           "options": {}
         }
       }
-    }
-  },
-  "mcp": {
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/sse"
-    },
-    "weather": {
-      "type": "local",
-      "command": ["opencode", "x", "@h1deya/mcp-server-weather"]
     }
   }
 }
