@@ -48,6 +48,41 @@ OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bas
 XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 ```
 
+### Usage
+
+After installing, configure provider credentials and start using the agent:
+
+```bash
+# log in to a model provider
+opencode auth login
+
+# list all available models across providers
+opencode models
+
+# open the interactive terminal UI in the current project
+opencode tui --model anthropic/claude-3.5-sonnet
+
+# run a single command and print the response
+opencode run "Generate a README section" --share
+
+# resume the most recent session
+opencode run --continue
+```
+
+#### Configuration
+
+`opencode` reads settings from an `opencode.json` or `opencode.jsonc` file in your project or home directory. Use it to set the default model, enable sharing, or load custom plugins. A minimal example:
+
+```jsonc
+{
+  "model": "openai/gpt-4o-mini",
+  "share": "auto",
+  "plugin": ["file://./.opencode/plugin/example.ts"]
+}
+```
+
+Override the configuration location with the `OPENCODE_CONFIG` environment variable.
+
 ### Repository Structure
 
 This repository is a Bun-managed monorepo. Key folders include:
