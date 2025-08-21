@@ -34,7 +34,7 @@
     "toolbeam-docs-theme": "0.4.3"
   },
   "devDependencies": {
-    "opencode": "workspace:*",
+    "ai_redteam": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }
