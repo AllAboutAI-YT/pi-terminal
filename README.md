@@ -48,6 +48,17 @@ OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bas
 XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
 ```
 
+### Repository Structure
+
+This repository is a Bun-managed monorepo. Key folders include:
+
+- `packages/` – core packages such as the CLI server (`opencode`), terminal UI (`tui`), web assets (`web`), plugins, and SDK sources.
+- `sdks/` – generated SDKs for clients like the VS Code extension.
+- `docs/` – sources for the documentation site.
+- `cloud/` and `infra/` – cloud functions and infrastructure configuration.
+- `script/` – helper scripts used during development.
+- `install/` – the installation script referenced above.
+  
 ### Documentation
 
 For more info on how to configure opencode [**head over to our docs**](https://opencode.ai/docs).
